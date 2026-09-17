@@ -427,14 +427,7 @@ async function initGame() {
         console.error('Failed to load high score:', err);
     }
     
-    birdImg.onload = () => {
-        requestAnimationFrame(gameLoop);
-    };
-    
-    // Fallback in case image is already cached
-    if (birdImg.complete) {
-        birdImg.onload();
-    }
+    requestAnimationFrame(gameLoop);
 }
 
 initGame();
