@@ -4,13 +4,13 @@ FROM node:18-alpine
 WORKDIR /app
 
 # Copy package files first for better caching
-COPY package*.json ./
+COPY src/package*.json ./
 
-# Install production dependencies only
-RUN npm ci --only=production
+# Install production dependencies
+RUN npm install --omit=dev
 
 # Copy the rest of the application code
-COPY . .
+COPY src .
 
 # Expose the port the server runs on
 EXPOSE 3000
