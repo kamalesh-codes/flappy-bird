@@ -18,14 +18,14 @@ pipeline {
         stage('Build & Test') {
             steps {
                 // Use a temporary docker container to run tests so we don't need Node installed on the Jenkins host
-                sh "docker build -t ${DOCKER_IMAGE}:test -f src/Dockerfile src"
+                sh "docker build -t ${DOCKER_IMAGE}:test -f Dockerfile src"
                 sh "docker run --rm ${DOCKER_IMAGE}:test npm test"
             }
         }
 
         stage('Build Production Image') {
             steps {
-                sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} -t ${DOCKER_IMAGE}:${DOCKER_LATEST} -f src/Dockerfile src"
+                sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} -t ${DOCKER_IMAGE}:${DOCKER_LATEST} -f Dockerfile src"
             }
         }
 
