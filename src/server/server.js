@@ -1,15 +1,15 @@
 const express = require('express');
 const path = require('path');
-const low = require('lowdb');
-const FileSync = require('lowdb/adapters/FileSync');
+const fs = require('fs-extra');
 const app = express();
 const PORT = 3000;
 
-const adapter = new FileSync(path.join(__dirname, '../../db.json'));
-const db = low(adapter);
+const DB_PATH = path.join(__dirname, '../../db.json');
 
-// Set defaults
-db.defaults({ highScores: [] }).write();
+// Initialize DB file if it doesn't exist
+if (!fs.existsSync(DB_PATH)) {
+    fs.writeJsonSync(DB_PATH, { highScores: [] });
+}
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../public')));
@@ -19,8 +19,16 @@ app.get('/', (req, res) => {
 });
 
 app.get('/api/highscore', (req, res) => {
-  const highScore = db.get('highScores').max('score').value() || { score: 0 };
-  res.json(highScore);
+  try {
+    const data = fs.readJsonSync(DB_PATH);
+    const scores = data.highScores || [];
+    const highScore = scores.length > 0 
+        ? scores.reduce((prev, current) => (prev.score > current.score) ? prev : current)
+        : { score: 0 };
+    res.json(highScore);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to read high score' });
+  }
 });
 
 app.post('/api/highscore', (req, res) => {
@@ -28,8 +36,14 @@ app.post('/api/highscore', (req, res) => {
   if (typeof score !== 'number') {
     return res.status(400).json({ error: 'Invalid score' });
   }
-  db.get('highScores').push({ score, date: new Date().toISOString() }).write();
-  res.sendStatus(201);
+  try {
+    const data = fs.readJsonSync(DB_PATH);
+    data.highScores.push({ score, date: new Date().toISOString() });
+    fs.writeJsonSync(DB_PATH, data);
+    res.sendStatus(201);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to save high score' });
+  }
 });
 
 app.listen(PORT, () => {
