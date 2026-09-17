@@ -14,23 +14,15 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Build & Test') {
             steps {
-                dir('src') {
-                    sh 'npm ci'
-                }
+                // Use a temporary docker container to run tests so we don't need Node installed on the Jenkins host
+                sh "docker build -t ${DOCKER_IMAGE}:test -f src/Dockerfile src"
+                sh "docker run --rm ${DOCKER_IMAGE}:test npm test"
             }
         }
 
-        stage('Run Tests') {
-            steps {
-                dir('src') {
-                    sh 'npm test'
-                }
-            }
-        }
-
-        stage('Build Docker Image') {
+        stage('Build Production Image') {
             steps {
                 sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} -t ${DOCKER_IMAGE}:${DOCKER_LATEST} -f src/Dockerfile src"
             }
@@ -38,11 +30,8 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                // Stop and remove existing container if it exists
                 sh 'docker stop flappy-bird-container || true'
                 sh 'docker rm flappy-bird-container || true'
-                
-                // Run the new container
                 sh "docker run -d -p 3000:3000 --name flappy-bird-container ${DOCKER_IMAGE}:${DOCKER_LATEST}"
             }
         }
