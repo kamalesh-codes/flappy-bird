@@ -2,10 +2,8 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'flappy-bird'
         DOCKER_TAG = "${env.BUILD_NUMBER}"
-        DOCKER_LATEST = 'latest'
-        DOCKER_HOST = 'unix:///home/iris/docker/desktop/docker-cli.sock'
+        DOCKER_HOST = 'unix:///home/iris/.docker/desktop/docker-cli.sock'
     }
 
     stages {
@@ -18,14 +16,14 @@ pipeline {
         stage('Build & Test') {
             steps {
                 // Use root as context so Dockerfile is found and can access src/
-                sh "docker build -t ${DOCKER_IMAGE}:test -f Dockerfile ."
-                sh "docker run --rm ${DOCKER_IMAGE}:test npm test"
+                sh "docker build -t flappy-bird:test -f Dockerfile ."
+                sh "docker run --rm flappy-bird:test npm test"
             }
         }
 
         stage('Build Production Image') {
             steps {
-                sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} -t ${DOCKER_IMAGE}:${DOCKER_LATEST} -f Dockerfile ."
+                sh "docker build -t flappy-bird:${DOCKER_TAG} -t flappy-bird:latest -f Dockerfile ."
             }
         }
 
@@ -33,7 +31,7 @@ pipeline {
             steps {
                 sh 'docker stop flappy-bird-container || true'
                 sh 'docker rm flappy-bird-container || true'
-                sh "docker run -d -p 3000:3000 --name flappy-bird-container ${DOCKER_IMAGE}:${DOCKER_LATEST}"
+                sh "docker run -d -p 3000:3000 --name flappy-bird-container flappy-bird:latest"
             }
         }
     }
