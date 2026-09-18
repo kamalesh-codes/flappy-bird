@@ -1,9 +1,13 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'docker:latest'
+            args '-v /home/iris/.docker/desktop/docker-cli.sock:/var/run/docker.sock'
+        }
+    }
 
     environment {
         DOCKER_TAG = "${env.BUILD_NUMBER}"
-        DOCKER_SOCK = 'unix:///home/iris/.docker/desktop/docker-cli.sock'
     }
 
     stages {
@@ -18,15 +22,15 @@ pipeline {
                 // Use root as context so Dockerfile is found and can access src/
                 sh "whoami"
                 sh "ls -la"
-                 sh "DOCKER_HOST=${DOCKER_SOCK} docker version"
-                 sh "DOCKER_HOST=${DOCKER_SOCK} docker build -t flappy-bird:test -f Dockerfile ."
-                 sh "DOCKER_HOST=${DOCKER_SOCK} docker run --rm flappy-bird:test npm test"
+                 sh "docker version"
+                 sh "docker build -t flappy-bird:test -f Dockerfile ."
+                 sh "docker run --rm flappy-bird:test npm test"
             }
         }
 
         stage('Build Production Image') {
             steps {
-                  sh "DOCKER_HOST=${DOCKER_SOCK} docker build -t flappy-bird:${DOCKER_TAG} -t flappy-bird:latest -f Dockerfile ."
+                  sh "docker build -t flappy-bird:${DOCKER_TAG} -t flappy-bird:latest -f Dockerfile ."
             }
         }
 
