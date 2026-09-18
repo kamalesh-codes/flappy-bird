@@ -18,7 +18,7 @@ pipeline {
                 // Use root as context so Dockerfile is found and can access src/
                 sh "whoami"
                 sh "ls -la"
-                sh "docker version"
+                 sh "sudo docker version"
                 sh "sudo docker build -t flappy-bird:test -f Dockerfile ."
                 sh "sudo docker run --rm flappy-bird:test npm test"
             }
@@ -26,15 +26,15 @@ pipeline {
 
         stage('Build Production Image') {
             steps {
-                sh "docker build -t flappy-bird:${DOCKER_TAG} -t flappy-bird:latest -f Dockerfile ."
+                 sh "sudo docker build -t flappy-bird:${DOCKER_TAG} -t flappy-bird:latest -f Dockerfile ."
             }
         }
 
         stage('Deploy') {
             steps {
-                sh 'docker stop flappy-bird-container || true'
-                sh 'docker rm flappy-bird-container || true'
-                sh "docker run -d -p 3000:3000 --name flappy-bird-container flappy-bird:latest"
+                 sh 'sudo docker stop flappy-bird-container || true'
+                 sh 'sudo docker rm flappy-bird-container || true'
+                 sh "sudo docker run -d -p 3000:3000 --name flappy-bird-container flappy-bird:latest"
             }
         }
     }
