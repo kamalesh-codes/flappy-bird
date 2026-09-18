@@ -1,13 +1,9 @@
 pipeline {
-    agent {
-        docker {
-            image 'docker:latest'
-            args '-v /home/iris/.docker/desktop/docker-cli.sock:/var/run/docker.sock'
-        }
-    }
+    agent any
 
     environment {
         DOCKER_TAG = "${env.BUILD_NUMBER}"
+        DOCKER_HOST = 'unix:///home/iris/.docker/desktop/docker-cli.sock'
     }
 
     stages {
@@ -36,9 +32,9 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                  sh "DOCKER_HOST=${DOCKER_SOCK} docker stop flappy-bird-container || true"
-                  sh "DOCKER_HOST=${DOCKER_SOCK} docker rm flappy-bird-container || true"
-                  sh "DOCKER_HOST=${DOCKER_SOCK} docker run -d -p 3000:3000 --name flappy-bird-container flappy-bird:latest"
+                  sh 'docker stop flappy-bird-container || true'
+                  sh 'docker rm flappy-bird-container || true'
+                  sh "docker run -d -p 3000:3000 --name flappy-bird-container flappy-bird:latest"
             }
         }
     }
