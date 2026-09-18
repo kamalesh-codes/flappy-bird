@@ -1,18 +1,9 @@
 pipeline {
     agent any
-
     stages {
-        stage('Checkout') {
+        stage('Hello') {
             steps {
-                checkout scm
-            }
-        }
-
-        stage('Build & Test') {
-            steps {
-                sh "whoami"
-                sh "ls -la"
-                sh "docker version"
+                echo 'Hello World'
             }
         }
     }
