@@ -5,7 +5,7 @@ pipeline {
         DOCKER_IMAGE = 'flappy-bird'
         DOCKER_TAG = "${env.BUILD_NUMBER}"
         DOCKER_LATEST = 'latest'
-        DOCKER_HOST = 'unix:///home/iris/.docker/desktop/docker-cli.sock'
+        DOCKER_HOST = 'unix:///home/iris/docker/desktop/docker-cli.sock'
     }
 
     stages {
