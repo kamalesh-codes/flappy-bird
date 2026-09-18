@@ -16,8 +16,8 @@ pipeline {
         stage('Build & Test') {
             steps {
                 // Use root as context so Dockerfile is found and can access src/
-                sh "docker build -t flappy-bird:test -f Dockerfile ."
-                sh "docker run --rm flappy-bird:test npm test"
+                sh "sudo docker build -t flappy-bird:test -f Dockerfile ."
+                sh "sudo docker run --rm flappy-bird:test npm test"
             }
         }
 
