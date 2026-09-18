@@ -3,7 +3,6 @@ pipeline {
 
     environment {
         DOCKER_TAG = "${env.BUILD_NUMBER}"
-        DOCKER_HOST = 'unix:///var/run/docker.sock'
     }
 
     stages {
